@@ -1,6 +1,7 @@
 import "package:auto_route/auto_route.dart";
 import "package:flutter/material.dart";
 import "package:sonar_assistant/core/router/app_router/app_router.gr.dart";
+import "package:sonar_assistant/utils/colors.dart";
 
 @RoutePage()
 class HomeWrapperPage extends StatelessWidget {
@@ -23,15 +24,17 @@ class HomeWrapperPage extends StatelessWidget {
         return Scaffold(
           body: child,
           bottomNavigationBar: BottomNavigationBar(
-            unselectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.w400,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.onSurface,
+            unselectedLabelStyle: const TextStyle( 
+              fontWeight: FontWeight.normal,
+              fontFamily: "OpenSans",
               fontSize: 14,
-              fontFamily: "SF Pro Display",
             ),
             selectedLabelStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.normal,
+              fontFamily: "OpenSans",
               fontSize: 14,
-              fontFamily: "SF Pro Display",
             ),
             currentIndex: tabsRouter.activeIndex,
             type: BottomNavigationBarType.fixed,
@@ -43,6 +46,7 @@ class HomeWrapperPage extends StatelessWidget {
             items: const [
               BottomNavigationBarItem(
                 label: "Чат",
+                
                 icon: Icon(Icons.chat),
               ),
               BottomNavigationBarItem(
@@ -50,11 +54,11 @@ class HomeWrapperPage extends StatelessWidget {
                 icon: Icon(Icons.camera),
               ),
               BottomNavigationBarItem(
-                label: "Карта",
+                label: "Карты",
                 icon: Icon(Icons.map),
               ),
               BottomNavigationBarItem(
-                label: "Уведомления",
+                label: "Пуши",
                 icon: Icon(Icons.notifications),
               ),
               BottomNavigationBarItem(
