@@ -61,14 +61,25 @@ final ThemeData appTheme = ThemeData(
 
 
   inputDecorationTheme: InputDecorationTheme(
-    filled: true,
-    fillColor: AppColors.grayF2,
+   
+    
+    fillColor: AppColors.surface,
+
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(8),
-      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(16.0),
+      borderSide: const BorderSide(color: Colors.white),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16.0),
+      borderSide: const BorderSide(color: Colors.white),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16.0),
+      borderSide: BorderSide(color: AppColors.primary),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     hintStyle: const TextStyle(
+      
       fontSize: 14,
       fontWeight: FontWeight.normal,
       color: AppColors.onSurface,

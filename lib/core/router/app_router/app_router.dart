@@ -15,33 +15,36 @@ class AppRouter extends RootStackRouter {
       children: [
         AutoRoute(
           page: ChatWrapperRoute.page,
-          path: "chat",
+          path: "landing",
           children: [
-            AutoRoute(page: ChatRoute.page, path: "start", initial: true),
-          
-  
+            AutoRoute(page: LandingRoute.page, path: "start", initial: true),
+            AutoRoute(page: ChatRoute.page, path: "chat", ),
           ],
         ),
-         
-         AutoRoute(
+
+        AutoRoute(
           page: CameraWrapperRoute.page,
           path: "camera",
           children: [
             AutoRoute(page: CameraRoute.page, path: "start", initial: true),
           ],
         ),
-         AutoRoute(
+        AutoRoute(
           page: MapsWrapperRoute.page,
           path: "maps",
           children: [
             AutoRoute(page: MapsRoute.page, path: "start", initial: true),
           ],
         ),
-         AutoRoute(
+        AutoRoute(
           page: NotificationsWrapperRoute.page,
           path: "notifications",
           children: [
-            AutoRoute(page: NotificationsRoute.page, path: "start", initial: true),
+            AutoRoute(
+              page: NotificationsRoute.page,
+              path: "start",
+              initial: true,
+            ),
           ],
         ),
         AutoRoute(

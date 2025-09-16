@@ -33,13 +33,6 @@ class AppColors {
   static const Color gray2B = Color(0xFF2B2B2B);
   static const Color black = Color(0xFF000000);
 
-  static const Color green0CAE00 = Color(0xFF0CAE00);
-  static const Color yellowE3BC22 = Color(0xFFE3BC22);
-  static const Color redFF0003 = Color(0xFFFF0003);
-  static Color red770305 = Color(0xFF770305);
-
-  static const Color redC20A0C = Color(0xFFC20A0C);
-
   static const Color backgroundColor = Color(0xFF1f2121);
 
   static const Color onSurface = Color(0xFF6a6c6c);
@@ -49,7 +42,6 @@ class AppColors {
 
   static const Color surface = Color(0xFF262828);
   static const Color gray626C71 = Color(0xFF626C71);
-
 
   static const Color blue3B82F6 = Color(0xFF3B82F6);
   static const Color purple9333EA = Color(0xFF9333EA);

@@ -11,7 +11,7 @@ class HomeWrapperPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AutoTabsRouter(
   
-      routes: [ChatRoute(), CameraRoute(), MapsRoute(), NotificationsRoute(),SettingsRoute()],
+      routes: [ChatRoute(), CameraWrapperRoute(), MapsWrapperRoute(), NotificationsWrapperRoute(),SettingsWrapperRoute()],
       transitionBuilder: (context, child, animation) => FadeTransition(
         opacity: animation,
 
