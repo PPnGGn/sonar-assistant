@@ -1,5 +1,4 @@
 import 'dart:developer' as developer;
-import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sonar_assistant/api/models/request/request_models.dart';
@@ -13,7 +12,7 @@ class ChatCubit extends Cubit<ChatState> {
   final List<MessageRequest> _messages = [];
   static const int _maxMessages = 20; // Максимальное количество сообщений в истории
 
-  /// Получение списка сообщений
+  /// Получение списка сообщений (оставлено для обратной совместимости, но UI должен использовать state)
   List<MessageRequest> get messages => List.unmodifiable(_messages);
 
   ChatCubit(this._repository) : super(const ChatState.initial());
@@ -21,37 +20,31 @@ class ChatCubit extends Cubit<ChatState> {
   /// Очистка истории сообщений
   void clearHistory() {
     _messages.clear();
-    emit(const ChatState.initial());
+    emit(const ChatState.initial(messages: []));
   }
 
   /// Отправка сообщения с ожиданием полного ответа
   Future<void> sendMessage(String text) async {
     try {
-      // Создаем временный список сообщений для запроса, не добавляя в историю
-      final tempMessages = List<MessageRequest>.from(_messages);
-      final userMessage = MessageRequest(role: 'user', content: text);
-      tempMessages.add(userMessage);
-      
-      // Показываем загрузку с текстом пользователя
-      emit(const ChatState.loading());
-      
-      // Создаем запрос с временным списком сообщений
+      // 1) Оптимистично добавляем сообщение пользователя в историю
+      _addUserMessage(text);
+      emit(ChatState.loading(messages: List.unmodifiable(_messages)));
+
+      // 2) Готовим запрос на основе актуальной истории
       final request = ChatRequest(
-        messages: tempMessages,
+        messages: List<MessageRequest>.from(_messages),
         stream: false,
       );
-      
-      // Отправляем запрос и ждем ответа
+
+      // 3) Отправляем запрос и ждём ответа
       final response = await _repository.sendMessage(request);
-      
-      // Проверяем и обрабатываем ответ
+
+      // 4) Проверяем и обрабатываем ответ
       if (response.choices.isNotEmpty) {
         final content = response.choices.first.message.content;
         if (content.isNotEmpty) {
-          // Добавляем оба сообщения в историю только после успешного ответа
-          _addUserMessage(text);
           _addAssistantMessage(content);
-          emit(ChatState.completed(content));
+          emit(ChatState.success(messages: List.unmodifiable(_messages)));
         } else {
           throw Exception('Получен пустой ответ от сервера');
         }
@@ -92,6 +85,6 @@ class ChatCubit extends Cubit<ChatState> {
   /// Обработка ошибок
   void _handleError(String message, StackTrace stackTrace) {
     developer.log(message, error: message, stackTrace: stackTrace);
-    emit(ChatState.error(message));
+    emit(ChatState.error(message, messages: List.unmodifiable(_messages)));
   }
 }

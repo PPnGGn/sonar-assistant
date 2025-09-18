@@ -8,19 +8,11 @@ class ChatRepository {
   final PerplexityApi _api;
   final String apiKey;
 
-  ChatRepository({required this.apiKey, Dio? dio}) : _api = PerplexityApi(
-    dio ?? Dio()
-      ..options.headers['Content-Type'] = 'application/json'
-      ..interceptors.add(InterceptorsWrapper(
-        onRequest: (options, handler) {
-          options.headers['Authorization'] = 'Bearer $apiKey';
-          options.headers['Content-Type'] = 'application/json';
-          return handler.next(options);
-        },
-      ))
-  );
+  ChatRepository({required this.apiKey, Dio? dio})
+      : _api = PerplexityApi(dio ?? Dio());
 
   Future<ChatResponse> sendMessage(ChatRequest request) async {
-    return _api.sendMessage('', request.copyWith(stream: false));
+    // Передаем заголовок авторизации явно согласно контракту API
+    return _api.sendMessage('Bearer $apiKey', request);
   }
 }

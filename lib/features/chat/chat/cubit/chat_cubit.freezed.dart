@@ -14,30 +14,61 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ChatState {
 
-
+ List<MessageRequest> get messages;
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ChatStateCopyWith<ChatState> get copyWith => _$ChatStateCopyWithImpl<ChatState>(this as ChatState, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChatState&&const DeepCollectionEquality().equals(other.messages, messages));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(messages));
 
 @override
 String toString() {
-  return 'ChatState()';
+  return 'ChatState(messages: $messages)';
 }
 
 
 }
 
 /// @nodoc
-class $ChatStateCopyWith<$Res>  {
-$ChatStateCopyWith(ChatState _, $Res Function(ChatState) __);
+abstract mixin class $ChatStateCopyWith<$Res>  {
+  factory $ChatStateCopyWith(ChatState value, $Res Function(ChatState) _then) = _$ChatStateCopyWithImpl;
+@useResult
+$Res call({
+ List<MessageRequest> messages
+});
+
+
+
+
+}
+/// @nodoc
+class _$ChatStateCopyWithImpl<$Res>
+    implements $ChatStateCopyWith<$Res> {
+  _$ChatStateCopyWithImpl(this._self, this._then);
+
+  final ChatState _self;
+  final $Res Function(ChatState) _then;
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? messages = null,}) {
+  return _then(_self.copyWith(
+messages: null == messages ? _self.messages : messages // ignore: cast_nullable_to_non_nullable
+as List<MessageRequest>,
+  ));
+}
+
 }
 
 
@@ -55,13 +86,13 @@ extension ChatStatePatterns on ChatState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Completed value)?  completed,TResult Function( _Error value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Success value)?  success,TResult Function( _Error value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Completed() when completed != null:
-return completed(_that);case _Error() when error != null:
+return loading(_that);case _Success() when success != null:
+return success(_that);case _Error() when error != null:
 return error(_that);case _:
   return orElse();
 
@@ -80,13 +111,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Completed value)  completed,required TResult Function( _Error value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Success value)  success,required TResult Function( _Error value)  error,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case _Loading():
-return loading(_that);case _Completed():
-return completed(_that);case _Error():
+return loading(_that);case _Success():
+return success(_that);case _Error():
 return error(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -104,13 +135,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Completed value)?  completed,TResult? Function( _Error value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Success value)?  success,TResult? Function( _Error value)?  error,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Completed() when completed != null:
-return completed(_that);case _Error() when error != null:
+return loading(_that);case _Success() when success != null:
+return success(_that);case _Error() when error != null:
 return error(_that);case _:
   return null;
 
@@ -128,13 +159,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String content)?  completed,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<MessageRequest> messages)?  initial,TResult Function( List<MessageRequest> messages)?  loading,TResult Function( List<MessageRequest> messages)?  success,TResult Function( String message,  List<MessageRequest> messages)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
-return loading();case _Completed() when completed != null:
-return completed(_that.content);case _Error() when error != null:
-return error(_that.message);case _:
+return initial(_that.messages);case _Loading() when loading != null:
+return loading(_that.messages);case _Success() when success != null:
+return success(_that.messages);case _Error() when error != null:
+return error(_that.message,_that.messages);case _:
   return orElse();
 
 }
@@ -152,13 +183,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String content)  completed,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<MessageRequest> messages)  initial,required TResult Function( List<MessageRequest> messages)  loading,required TResult Function( List<MessageRequest> messages)  success,required TResult Function( String message,  List<MessageRequest> messages)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
-return initial();case _Loading():
-return loading();case _Completed():
-return completed(_that.content);case _Error():
-return error(_that.message);case _:
+return initial(_that.messages);case _Loading():
+return loading(_that.messages);case _Success():
+return success(_that.messages);case _Error():
+return error(_that.message,_that.messages);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -175,13 +206,13 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String content)?  completed,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<MessageRequest> messages)?  initial,TResult? Function( List<MessageRequest> messages)?  loading,TResult? Function( List<MessageRequest> messages)?  success,TResult? Function( String message,  List<MessageRequest> messages)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
-return initial();case _Loading() when loading != null:
-return loading();case _Completed() when completed != null:
-return completed(_that.content);case _Error() when error != null:
-return error(_that.message);case _:
+return initial(_that.messages);case _Loading() when loading != null:
+return loading(_that.messages);case _Success() when success != null:
+return success(_that.messages);case _Error() when error != null:
+return error(_that.message,_that.messages);case _:
   return null;
 
 }
@@ -193,106 +224,48 @@ return error(_that.message);case _:
 
 
 class _Initial implements ChatState {
-  const _Initial();
+  const _Initial({final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
   
 
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
+ final  List<MessageRequest> _messages;
+@override@JsonKey() List<MessageRequest> get messages {
+  if (_messages is EqualUnmodifiableListView) return _messages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_messages);
 }
 
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'ChatState.initial()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Loading implements ChatState {
-  const _Loading();
-  
-
-
-
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loading);
-}
-
-
-@override
-int get hashCode => runtimeType.hashCode;
-
-@override
-String toString() {
-  return 'ChatState.loading()';
-}
-
-
-}
-
-
-
-
-/// @nodoc
-
-
-class _Completed implements ChatState {
-  const _Completed(this.content);
-  
-
- final  String content;
 
 /// Create a copy of ChatState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$CompletedCopyWith<_Completed> get copyWith => __$CompletedCopyWithImpl<_Completed>(this, _$identity);
+_$InitialCopyWith<_Initial> get copyWith => __$InitialCopyWithImpl<_Initial>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Completed&&(identical(other.content, content) || other.content == content));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial&&const DeepCollectionEquality().equals(other._messages, _messages));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,content);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages));
 
 @override
 String toString() {
-  return 'ChatState.completed(content: $content)';
+  return 'ChatState.initial(messages: $messages)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$CompletedCopyWith<$Res> implements $ChatStateCopyWith<$Res> {
-  factory _$CompletedCopyWith(_Completed value, $Res Function(_Completed) _then) = __$CompletedCopyWithImpl;
-@useResult
+abstract mixin class _$InitialCopyWith<$Res> implements $ChatStateCopyWith<$Res> {
+  factory _$InitialCopyWith(_Initial value, $Res Function(_Initial) _then) = __$InitialCopyWithImpl;
+@override @useResult
 $Res call({
- String content
+ List<MessageRequest> messages
 });
 
 
@@ -300,19 +273,163 @@ $Res call({
 
 }
 /// @nodoc
-class __$CompletedCopyWithImpl<$Res>
-    implements _$CompletedCopyWith<$Res> {
-  __$CompletedCopyWithImpl(this._self, this._then);
+class __$InitialCopyWithImpl<$Res>
+    implements _$InitialCopyWith<$Res> {
+  __$InitialCopyWithImpl(this._self, this._then);
 
-  final _Completed _self;
-  final $Res Function(_Completed) _then;
+  final _Initial _self;
+  final $Res Function(_Initial) _then;
 
 /// Create a copy of ChatState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? content = null,}) {
-  return _then(_Completed(
-null == content ? _self.content : content // ignore: cast_nullable_to_non_nullable
-as String,
+@override @pragma('vm:prefer-inline') $Res call({Object? messages = null,}) {
+  return _then(_Initial(
+messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
+as List<MessageRequest>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _Loading implements ChatState {
+  const _Loading({final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
+  
+
+ final  List<MessageRequest> _messages;
+@override@JsonKey() List<MessageRequest> get messages {
+  if (_messages is EqualUnmodifiableListView) return _messages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_messages);
+}
+
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$LoadingCopyWith<_Loading> get copyWith => __$LoadingCopyWithImpl<_Loading>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loading&&const DeepCollectionEquality().equals(other._messages, _messages));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages));
+
+@override
+String toString() {
+  return 'ChatState.loading(messages: $messages)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$LoadingCopyWith<$Res> implements $ChatStateCopyWith<$Res> {
+  factory _$LoadingCopyWith(_Loading value, $Res Function(_Loading) _then) = __$LoadingCopyWithImpl;
+@override @useResult
+$Res call({
+ List<MessageRequest> messages
+});
+
+
+
+
+}
+/// @nodoc
+class __$LoadingCopyWithImpl<$Res>
+    implements _$LoadingCopyWith<$Res> {
+  __$LoadingCopyWithImpl(this._self, this._then);
+
+  final _Loading _self;
+  final $Res Function(_Loading) _then;
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? messages = null,}) {
+  return _then(_Loading(
+messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
+as List<MessageRequest>,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _Success implements ChatState {
+  const _Success({final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
+  
+
+ final  List<MessageRequest> _messages;
+@override@JsonKey() List<MessageRequest> get messages {
+  if (_messages is EqualUnmodifiableListView) return _messages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_messages);
+}
+
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SuccessCopyWith<_Success> get copyWith => __$SuccessCopyWithImpl<_Success>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Success&&const DeepCollectionEquality().equals(other._messages, _messages));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages));
+
+@override
+String toString() {
+  return 'ChatState.success(messages: $messages)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SuccessCopyWith<$Res> implements $ChatStateCopyWith<$Res> {
+  factory _$SuccessCopyWith(_Success value, $Res Function(_Success) _then) = __$SuccessCopyWithImpl;
+@override @useResult
+$Res call({
+ List<MessageRequest> messages
+});
+
+
+
+
+}
+/// @nodoc
+class __$SuccessCopyWithImpl<$Res>
+    implements _$SuccessCopyWith<$Res> {
+  __$SuccessCopyWithImpl(this._self, this._then);
+
+  final _Success _self;
+  final $Res Function(_Success) _then;
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? messages = null,}) {
+  return _then(_Success(
+messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
+as List<MessageRequest>,
   ));
 }
 
@@ -323,14 +440,21 @@ as String,
 
 
 class _Error implements ChatState {
-  const _Error(this.message);
+  const _Error(this.message, {final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
   
 
  final  String message;
+ final  List<MessageRequest> _messages;
+@override@JsonKey() List<MessageRequest> get messages {
+  if (_messages is EqualUnmodifiableListView) return _messages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_messages);
+}
+
 
 /// Create a copy of ChatState
 /// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
+@override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$ErrorCopyWith<_Error> get copyWith => __$ErrorCopyWithImpl<_Error>(this, _$identity);
 
@@ -338,16 +462,16 @@ _$ErrorCopyWith<_Error> get copyWith => __$ErrorCopyWithImpl<_Error>(this, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message)&&const DeepCollectionEquality().equals(other._messages, _messages));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message);
+int get hashCode => Object.hash(runtimeType,message,const DeepCollectionEquality().hash(_messages));
 
 @override
 String toString() {
-  return 'ChatState.error(message: $message)';
+  return 'ChatState.error(message: $message, messages: $messages)';
 }
 
 
@@ -356,9 +480,9 @@ String toString() {
 /// @nodoc
 abstract mixin class _$ErrorCopyWith<$Res> implements $ChatStateCopyWith<$Res> {
   factory _$ErrorCopyWith(_Error value, $Res Function(_Error) _then) = __$ErrorCopyWithImpl;
-@useResult
+@override @useResult
 $Res call({
- String message
+ String message, List<MessageRequest> messages
 });
 
 
@@ -375,10 +499,11 @@ class __$ErrorCopyWithImpl<$Res>
 
 /// Create a copy of ChatState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? messages = null,}) {
   return _then(_Error(
 null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+as String,messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
+as List<MessageRequest>,
   ));
 }
 

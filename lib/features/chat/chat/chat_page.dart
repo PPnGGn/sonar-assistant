@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sonar_assistant/features/chat/chat/cubit/chat_cubit.dart';
+import 'package:sonar_assistant/api/models/request/request_models.dart';
 import 'package:sonar_assistant/utils/colors.dart';
 
 @RoutePage()
@@ -53,27 +54,33 @@ class _ChatPageState extends State<ChatPage> {
 
       body: BlocConsumer<ChatCubit, ChatState>(
         listener: (context, state) {
-          state.whenOrNull(
-            error: (error) => ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(error))),
+          state.map(
+            initial: (_) {},
+            loading: (_) {},
+            success: (_) {},
+            error: (s) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(s.message)),
+              );
+            },
           );
-          _scrollToBottom();
+          // Скроллим в конец после кадра, когда список отрисован
+          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
         },
         builder: (context, state) {
+          final messages = state.map(
+            initial: (s) => s.messages,
+            loading: (s) => s.messages,
+            success: (s) => s.messages,
+            error: (s) => s.messages,
+          );
           return Column(
             children: [
               // Область сообщений
               Expanded(
-                child: state.when(
-                  initial: () => const Center(child: Text('Начните диалог')),
-                  loading: () {
-                    return _buildMessagesList(context, '', true);
-                  },
-                  completed: (content) =>
-                      _buildMessagesList(context, '', false),
-                  error: (error) => Center(child: Text('Ошибка: $error')),
-                ),
+                child: messages.isEmpty
+                    ? const Center(child: Text('Начните диалог'))
+                    : _buildMessagesList(context, messages),
               ),
               // Поле ввода сообщения
               _buildMessageInput(context),
@@ -86,26 +93,18 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _buildMessagesList(
     BuildContext context,
-    String content,
-    bool isLoading,
+    List<MessageRequest> messages,
   ) {
-    final cubit = context.read<ChatCubit>();
-    final messages = cubit.messages;
-
-    final displayMessages = List<MapEntry<bool, String>>.from(
+    final display = List<MapEntry<bool, String>>.from(
       messages.map((msg) => MapEntry(msg.role == 'user', msg.content)),
     );
-
-    if (content.isNotEmpty) {
-      displayMessages.add(MapEntry(false, content));
-    }
 
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      itemCount: displayMessages.length,
+      itemCount: display.length,
       itemBuilder: (context, index) {
-        final message = displayMessages[index];
+        final message = display[index];
         return _buildMessageBubble(
           context,
           message: message.value,
@@ -149,9 +148,11 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageInput(BuildContext context) {
     return BlocBuilder<ChatCubit, ChatState>(
       builder: (context, state) {
-        final isLoading = state.maybeWhen(
-          loading: () => true,
-          orElse: () => false,
+        final isLoading = state.map(
+          initial: (_) => false,
+          loading: (_) => true,
+          success: (_) => false,
+          error: (_) => false,
         );
 
         return Container(
