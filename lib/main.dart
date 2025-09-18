@@ -1,4 +1,4 @@
-
+// lib/main.dart
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,24 +9,22 @@ import 'package:sonar_assistant/utils/theme.dart';
 
 void main() {
   const apiKey = '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';
-  
-  // Инициализируем репозиторий с API ключом
+
+  // Инициализируем репозиторий с поддержкой стриминга
   final chatRepository = ChatRepository(
     apiKey: apiKey,
     dio: Dio(),
   );
-  
+
   runApp(
     MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<ChatRepository>.value(value: chatRepository),
+        RepositoryProvider.value(value: chatRepository),
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<ChatCubit>(
-            create: (context) => ChatCubit(
-              context.read<ChatRepository>(),
-            ),
+          BlocProvider(
+            create: (context) => ChatCubit(context.read<ChatRepository>()),
           ),
         ],
         child: const MyApp(),
@@ -35,17 +33,16 @@ void main() {
   );
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     final appRouter = AppRouter();
+
     return MaterialApp.router(
+      title: 'Sonar Assistant',
       theme: appTheme,
-      debugShowCheckedModeBanner: false,
       routerConfig: appRouter.config(),
     );
   }

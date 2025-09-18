@@ -86,12 +86,13 @@ extension ChatStatePatterns on ChatState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Success value)?  success,TResult Function( _Error value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Initial value)?  initial,TResult Function( _Loading value)?  loading,TResult Function( _Streaming value)?  streaming,TResult Function( _Success value)?  success,TResult Function( _Error value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Success() when success != null:
+return loading(_that);case _Streaming() when streaming != null:
+return streaming(_that);case _Success() when success != null:
 return success(_that);case _Error() when error != null:
 return error(_that);case _:
   return orElse();
@@ -111,12 +112,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Success value)  success,required TResult Function( _Error value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Initial value)  initial,required TResult Function( _Loading value)  loading,required TResult Function( _Streaming value)  streaming,required TResult Function( _Success value)  success,required TResult Function( _Error value)  error,}){
 final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that);case _Loading():
-return loading(_that);case _Success():
+return loading(_that);case _Streaming():
+return streaming(_that);case _Success():
 return success(_that);case _Error():
 return error(_that);case _:
   throw StateError('Unexpected subclass');
@@ -135,12 +137,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Success value)?  success,TResult? Function( _Error value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Initial value)?  initial,TResult? Function( _Loading value)?  loading,TResult? Function( _Streaming value)?  streaming,TResult? Function( _Success value)?  success,TResult? Function( _Error value)?  error,}){
 final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that);case _Loading() when loading != null:
-return loading(_that);case _Success() when success != null:
+return loading(_that);case _Streaming() when streaming != null:
+return streaming(_that);case _Success() when success != null:
 return success(_that);case _Error() when error != null:
 return error(_that);case _:
   return null;
@@ -159,11 +162,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<MessageRequest> messages)?  initial,TResult Function( List<MessageRequest> messages)?  loading,TResult Function( List<MessageRequest> messages)?  success,TResult Function( String message,  List<MessageRequest> messages)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<MessageRequest> messages)?  initial,TResult Function( List<MessageRequest> messages)?  loading,TResult Function( List<MessageRequest> messages,  String streamingContent)?  streaming,TResult Function( List<MessageRequest> messages)?  success,TResult Function( String message,  List<MessageRequest> messages)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that.messages);case _Loading() when loading != null:
-return loading(_that.messages);case _Success() when success != null:
+return loading(_that.messages);case _Streaming() when streaming != null:
+return streaming(_that.messages,_that.streamingContent);case _Success() when success != null:
 return success(_that.messages);case _Error() when error != null:
 return error(_that.message,_that.messages);case _:
   return orElse();
@@ -183,11 +187,12 @@ return error(_that.message,_that.messages);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<MessageRequest> messages)  initial,required TResult Function( List<MessageRequest> messages)  loading,required TResult Function( List<MessageRequest> messages)  success,required TResult Function( String message,  List<MessageRequest> messages)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<MessageRequest> messages)  initial,required TResult Function( List<MessageRequest> messages)  loading,required TResult Function( List<MessageRequest> messages,  String streamingContent)  streaming,required TResult Function( List<MessageRequest> messages)  success,required TResult Function( String message,  List<MessageRequest> messages)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial(_that.messages);case _Loading():
-return loading(_that.messages);case _Success():
+return loading(_that.messages);case _Streaming():
+return streaming(_that.messages,_that.streamingContent);case _Success():
 return success(_that.messages);case _Error():
 return error(_that.message,_that.messages);case _:
   throw StateError('Unexpected subclass');
@@ -206,11 +211,12 @@ return error(_that.message,_that.messages);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<MessageRequest> messages)?  initial,TResult? Function( List<MessageRequest> messages)?  loading,TResult? Function( List<MessageRequest> messages)?  success,TResult? Function( String message,  List<MessageRequest> messages)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<MessageRequest> messages)?  initial,TResult? Function( List<MessageRequest> messages)?  loading,TResult? Function( List<MessageRequest> messages,  String streamingContent)?  streaming,TResult? Function( List<MessageRequest> messages)?  success,TResult? Function( String message,  List<MessageRequest> messages)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial(_that.messages);case _Loading() when loading != null:
-return loading(_that.messages);case _Success() when success != null:
+return loading(_that.messages);case _Streaming() when streaming != null:
+return streaming(_that.messages,_that.streamingContent);case _Success() when success != null:
 return success(_that.messages);case _Error() when error != null:
 return error(_that.message,_that.messages);case _:
   return null;
@@ -224,7 +230,7 @@ return error(_that.message,_that.messages);case _:
 
 
 class _Initial implements ChatState {
-  const _Initial({final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
+  const _Initial({final  List<MessageRequest> messages = const []}): _messages = messages;
   
 
  final  List<MessageRequest> _messages;
@@ -296,7 +302,7 @@ as List<MessageRequest>,
 
 
 class _Loading implements ChatState {
-  const _Loading({final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
+  const _Loading({final  List<MessageRequest> messages = const []}): _messages = messages;
   
 
  final  List<MessageRequest> _messages;
@@ -367,8 +373,82 @@ as List<MessageRequest>,
 /// @nodoc
 
 
+class _Streaming implements ChatState {
+  const _Streaming({final  List<MessageRequest> messages = const [], this.streamingContent = ''}): _messages = messages;
+  
+
+ final  List<MessageRequest> _messages;
+@override@JsonKey() List<MessageRequest> get messages {
+  if (_messages is EqualUnmodifiableListView) return _messages;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_messages);
+}
+
+@JsonKey() final  String streamingContent;
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$StreamingCopyWith<_Streaming> get copyWith => __$StreamingCopyWithImpl<_Streaming>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Streaming&&const DeepCollectionEquality().equals(other._messages, _messages)&&(identical(other.streamingContent, streamingContent) || other.streamingContent == streamingContent));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_messages),streamingContent);
+
+@override
+String toString() {
+  return 'ChatState.streaming(messages: $messages, streamingContent: $streamingContent)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$StreamingCopyWith<$Res> implements $ChatStateCopyWith<$Res> {
+  factory _$StreamingCopyWith(_Streaming value, $Res Function(_Streaming) _then) = __$StreamingCopyWithImpl;
+@override @useResult
+$Res call({
+ List<MessageRequest> messages, String streamingContent
+});
+
+
+
+
+}
+/// @nodoc
+class __$StreamingCopyWithImpl<$Res>
+    implements _$StreamingCopyWith<$Res> {
+  __$StreamingCopyWithImpl(this._self, this._then);
+
+  final _Streaming _self;
+  final $Res Function(_Streaming) _then;
+
+/// Create a copy of ChatState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? messages = null,Object? streamingContent = null,}) {
+  return _then(_Streaming(
+messages: null == messages ? _self._messages : messages // ignore: cast_nullable_to_non_nullable
+as List<MessageRequest>,streamingContent: null == streamingContent ? _self.streamingContent : streamingContent // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
 class _Success implements ChatState {
-  const _Success({final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
+  const _Success({final  List<MessageRequest> messages = const []}): _messages = messages;
   
 
  final  List<MessageRequest> _messages;
@@ -440,7 +520,7 @@ as List<MessageRequest>,
 
 
 class _Error implements ChatState {
-  const _Error(this.message, {final  List<MessageRequest> messages = const <MessageRequest>[]}): _messages = messages;
+  const _Error(this.message, {final  List<MessageRequest> messages = const []}): _messages = messages;
   
 
  final  String message;

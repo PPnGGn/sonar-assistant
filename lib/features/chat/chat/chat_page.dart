@@ -28,8 +28,8 @@ class _ChatPageState extends State<ChatPage> {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutCubic,
       );
     }
   }
@@ -37,6 +37,8 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Явно разрешаем изменять размер при появлении клавиатуры
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text('ИИ ЧАТ'),
         backgroundColor: Colors.transparent,
@@ -51,42 +53,65 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
+      body: AnimatedPadding(
+        // Плавный сдвиг контента вверх/вниз при появлении/скрытии клавиатуры
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        child: BlocConsumer<ChatCubit, ChatState>(
+          listener: (context, state) {
+            state.map(
+              initial: (_) {},
+              loading: (_) {},
+              streaming: (_) {},
+              success: (_) {},
+              error: (s) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(s.message)),
+                );
+              },
+            );
+            // Скроллим в конец после кадра, когда список отрисован
+            WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+          },
+          builder: (context, state) {
+            // Базовый список сообщений из состояния
+            List<MessageRequest> messages = state.map(
+              initial: (s) => s.messages,
+              loading: (s) => s.messages,
+              streaming: (s) => s.messages,
+              success: (s) => s.messages,
+              error: (s) => s.messages,
+            );
 
-      body: BlocConsumer<ChatCubit, ChatState>(
-        listener: (context, state) {
-          state.map(
-            initial: (_) {},
-            loading: (_) {},
-            success: (_) {},
-            error: (s) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(s.message)),
-              );
-            },
-          );
-          // Скроллим в конец после кадра, когда список отрисован
-          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
-        },
-        builder: (context, state) {
-          final messages = state.map(
-            initial: (s) => s.messages,
-            loading: (s) => s.messages,
-            success: (s) => s.messages,
-            error: (s) => s.messages,
-          );
-          return Column(
-            children: [
-              // Область сообщений
-              Expanded(
-                child: messages.isEmpty
-                    ? const Center(child: Text('Начните диалог'))
-                    : _buildMessagesList(context, messages),
-              ),
-              // Поле ввода сообщения
-              _buildMessageInput(context),
-            ],
-          );
-        },
+            // Во время стриминга добавляем временное сообщение ассистента
+            state.maybeMap(
+              streaming: (s) {
+                if (s.streamingContent.isNotEmpty) {
+                  messages = [
+                    ...messages,
+                    MessageRequest(role: 'assistant', content: s.streamingContent),
+                  ];
+                }
+              },
+              orElse: () {},
+            );
+            return Column(
+              children: [
+                // Область сообщений
+                Expanded(
+                  child: messages.isEmpty
+                      ? const Center(child: Text('Начните диалог'))
+                      : _buildMessagesList(context, messages),
+                ),
+                // Поле ввода сообщения
+                _buildMessageInput(context),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -101,6 +126,7 @@ class _ChatPageState extends State<ChatPage> {
 
     return ListView.builder(
       controller: _scrollController,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       itemCount: display.length,
       itemBuilder: (context, index) {
@@ -148,9 +174,11 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageInput(BuildContext context) {
     return BlocBuilder<ChatCubit, ChatState>(
       builder: (context, state) {
-        final isLoading = state.map(
+        // Блокируем ввод во время loading и streaming
+        final isBusy = state.map(
           initial: (_) => false,
           loading: (_) => true,
+          streaming: (_) => true,
           success: (_) => false,
           error: (_) => false,
         );
@@ -170,7 +198,7 @@ class _ChatPageState extends State<ChatPage> {
                       fontFamily: "OpenSans",
                     ),
                     controller: _messageController,
-                    enabled: !isLoading,
+                    enabled: !isBusy,
                     decoration: InputDecoration(
                       
                       fillColor: AppColors.surface,
@@ -194,17 +222,17 @@ class _ChatPageState extends State<ChatPage> {
                         color: AppColors.onSurface,
                       ),
 
-                      hintText: isLoading
+                      hintText: isBusy
                           ? 'Отправка...'
                           : 'Введите сообщение...',
                     ),
-                    onSubmitted: isLoading ? null : (_) => _sendMessage(),
+                    onSubmitted: isBusy ? null : (_) => _sendMessageStreaming(),
                   ),
                 ),
                 const SizedBox(width: 8.0),
 
                 GestureDetector(
-                  onTap: isLoading ? null : _sendMessage,
+                  onTap: isBusy ? null : _sendMessageStreaming,
                   child: Container(
                     height: 40,
                     width: 40,
@@ -213,7 +241,7 @@ class _ChatPageState extends State<ChatPage> {
                       borderRadius: BorderRadius.circular(14),
                       gradient: LinearGradient(colors: AppColors.mainGradient),
                     ),
-                    child: isLoading
+                    child: isBusy
                         ? const SizedBox(
                             width: 10,
                             height: 10,
@@ -235,10 +263,10 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  void _sendMessage() {
+  void _sendMessageStreaming() {
     final message = _messageController.text.trim();
     if (message.isNotEmpty) {
-      context.read<ChatCubit>().sendMessage(message);
+      context.read<ChatCubit>().sendMessageWithStreaming(message);
       _messageController.clear();
     }
   }

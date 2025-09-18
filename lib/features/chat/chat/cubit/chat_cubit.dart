@@ -1,3 +1,5 @@
+// lib/features/chat/chat/cubit/chat_cubit.dart
+import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,42 +11,78 @@ part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _repository;
-  final List<MessageRequest> _messages = [];
-  static const int _maxMessages = 20; // Максимальное количество сообщений в истории
-
-  /// Получение списка сообщений (оставлено для обратной совместимости, но UI должен использовать state)
-  List<MessageRequest> get messages => List.unmodifiable(_messages);
+  StreamSubscription<String>? _streamSubscription;
+  static const int _maxMessages = 20;
 
   ChatCubit(this._repository) : super(const ChatState.initial());
 
-  /// Очистка истории сообщений
-  void clearHistory() {
-    _messages.clear();
-    emit(const ChatState.initial(messages: []));
+  /// Отправка сообщения со стримингом
+  Future<void> sendMessageWithStreaming(String text) async {
+    try {
+      // Добавляем сообщение пользователя
+      final userMessage = MessageRequest(role: 'user', content: text);
+      final currentMessages = [...state.messages, userMessage];
+      
+      emit(ChatState.loading(messages: currentMessages));
+
+      String accumulatedResponse = '';
+      
+      // Отменяем предыдущую подписку если есть
+      _streamSubscription?.cancel();
+
+      // Подписываемся на стрим
+      _streamSubscription = _repository.sendMessageStream(currentMessages).listen(
+        (chunk) {
+          accumulatedResponse += chunk;
+          emit(ChatState.streaming(
+            messages: currentMessages,
+            streamingContent: accumulatedResponse,
+          ));
+        },
+        onDone: () {
+          // Добавляем финальный ответ ассистента
+          final assistantMessage = MessageRequest(
+            role: 'assistant', 
+            content: accumulatedResponse,
+          );
+          
+          final finalMessages = [...currentMessages, assistantMessage];
+          _trimMessages(finalMessages);
+          
+          emit(ChatState.success(messages: finalMessages));
+        },
+        onError: (error) {
+          _handleError('Streaming error: $error', StackTrace.current, currentMessages);
+        },
+      );
+    } catch (e, stackTrace) {
+      _handleError('Ошибка при отправке сообщения: $e', stackTrace, state.messages);
+    }
   }
 
-  /// Отправка сообщения с ожиданием полного ответа
+  /// Отправка обычного сообщения (без стриминга)
   Future<void> sendMessage(String text) async {
     try {
-      // 1) Оптимистично добавляем сообщение пользователя в историю
-      _addUserMessage(text);
-      emit(ChatState.loading(messages: List.unmodifiable(_messages)));
+      final userMessage = MessageRequest(role: 'user', content: text);
+      final currentMessages = [...state.messages, userMessage];
+      
+      emit(ChatState.loading(messages: currentMessages));
 
-      // 2) Готовим запрос на основе актуальной истории
       final request = ChatRequest(
-        messages: List<MessageRequest>.from(_messages),
+        messages: currentMessages,
         stream: false,
       );
 
-      // 3) Отправляем запрос и ждём ответа
       final response = await _repository.sendMessage(request);
 
-      // 4) Проверяем и обрабатываем ответ
       if (response.choices.isNotEmpty) {
         final content = response.choices.first.message.content;
         if (content.isNotEmpty) {
-          _addAssistantMessage(content);
-          emit(ChatState.success(messages: List.unmodifiable(_messages)));
+          final assistantMessage = MessageRequest(role: 'assistant', content: content);
+          final finalMessages = [...currentMessages, assistantMessage];
+          _trimMessages(finalMessages);
+          
+          emit(ChatState.success(messages: finalMessages));
         } else {
           throw Exception('Получен пустой ответ от сервера');
         }
@@ -52,39 +90,33 @@ class ChatCubit extends Cubit<ChatState> {
         throw Exception('Некорректный формат ответа от сервера');
       }
     } catch (e, stackTrace) {
-      _handleError('Ошибка при отправке сообщения: $e', stackTrace);
+      _handleError('Ошибка при отправке сообщения: $e', stackTrace, state.messages);
     }
   }
 
-  
-  /// Добавление сообщения пользователя в историю
-  void _addUserMessage(String text) {
-    _messages.add(MessageRequest(
-      role: 'user',
-      content: text,
-    ));
-    _trimMessages();
+  /// Очистка истории сообщений
+  void clearHistory() {
+    _streamSubscription?.cancel();
+    emit(const ChatState.initial(messages: []));
   }
-  
-  /// Добавление ответа ассистента в историю
-  void _addAssistantMessage(String text) {
-    _messages.add(MessageRequest(
-      role: 'assistant',
-      content: text,
-    ));
-    _trimMessages();
-  }
-  
+
   /// Ограничение размера истории сообщений
-  void _trimMessages() {
-    if (_messages.length > _maxMessages) {
-      _messages.removeRange(0, _messages.length - _maxMessages);
+  void _trimMessages(List<MessageRequest> messages) {
+    if (messages.length > _maxMessages) {
+      messages.removeRange(0, messages.length - _maxMessages);
     }
   }
-  
+
   /// Обработка ошибок
-  void _handleError(String message, StackTrace stackTrace) {
+  void _handleError(String message, StackTrace stackTrace, List<MessageRequest> messages) {
     developer.log(message, error: message, stackTrace: stackTrace);
-    emit(ChatState.error(message, messages: List.unmodifiable(_messages)));
+    emit(ChatState.error(message, messages: messages));
+  }
+
+  @override
+  Future<void> close() {
+    _streamSubscription?.cancel();
+    _repository.dispose();
+    return super.close();
   }
 }
